@@ -8,7 +8,7 @@ setup(
     author_email="william.schumacher@gmail.com",
     packages=find_packages(),
     scripts=[],
-    url="https://github.com/pace-systems/pipedrive-api",
+    url="https://github.com/pace-systems/py-pipedrive-api",
     license="MIT",
     description="An unofficial Pipedrive API client.",
     long_description=open("README.md").read() if exists("README.md") else "",
@@ -23,6 +23,6 @@ setup(
     install_requires=[
         "requests",
     ],
-    version="0.1.0",
+    version="0.1.1",
     zip_safe=False,
 )
