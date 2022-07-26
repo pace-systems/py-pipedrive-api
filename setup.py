@@ -23,6 +23,6 @@ setup(
     install_requires=[
         "requests",
     ],
-    version="0.1.1",
+    version="0.1.2",
     zip_safe=False,
 )

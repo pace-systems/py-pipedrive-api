@@ -16,7 +16,7 @@ class URIMixin:  # pylint: disable=too-few-public-methods
         :return: URI
         """
         return (
-            f"{self.pipedrive.base_endpoint}/{self.base_endpoint}?"
+            f"{self.pipedrive.base_url}/{self.base_endpoint}?"
             f"{self.pipedrive.api_token}"
         )
 
