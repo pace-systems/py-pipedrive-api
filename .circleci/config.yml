@@ -1,0 +1,23 @@
+version: 2.1
+jobs:
+  test:
+    parameters:
+      python-version:
+        type: string
+    docker:
+      - image: cimg/<< parameters.python-version >>
+    steps:
+      - checkout
+      - run: pip install --user pipenv
+      - run: PIPENV_QUIET=True pipenv lock --dev -r > requirements.txt
+      - run: pip install -r requirements.txt
+      - run: ./qa.sh
+
+
+workflows:
+  all-tests:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              python-version: ["python:3.8.13", "python:3.9.13", "python:3.10.4"]
