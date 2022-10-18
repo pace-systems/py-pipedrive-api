@@ -5,9 +5,12 @@ from typing import Dict, List, Optional, Tuple
 from urllib.parse import quote
 
 import requests
+import eventlet
 
 from pipedrive.mixins import FieldsMixin, URIMixin
 from pipedrive.utils import process_response
+
+eventlet.monkey_patch()
 
 
 class OrganizationAPI(  # pylint: disable=too-many-instance-attributes
@@ -86,7 +89,8 @@ class OrganizationAPI(  # pylint: disable=too-many-instance-attributes
             if org_id in self._details_cache:
                 return self._details_cache[org_id]
 
-        req = requests.get(self._get_details_uri(org_id))
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.get(self._get_details_uri(org_id))
         data = process_response(req)
         self._details_cache[org_id] = data
         return data
@@ -104,7 +108,8 @@ class OrganizationAPI(  # pylint: disable=too-many-instance-attributes
             cached_results = self._find_cache.get(term)
             if cached_results:
                 return cached_results
-        req = requests.get(self._get_search_endpoint_uri(term))
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.get(self._get_search_endpoint_uri(term))
         data = process_response(req)
         value = data["items"]
         self._find_cache[term] = value
@@ -142,7 +147,8 @@ class OrganizationAPI(  # pylint: disable=too-many-instance-attributes
             "address": address,
             **extra_fields,
         }
-        req = requests.post(self._get_base_uri(), data=payload)
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.post(self._get_base_uri(), data=payload)
         return process_response(req)
 
     def get_people(self, organization_id, no_cache: bool = False) -> List:
@@ -158,7 +164,8 @@ class OrganizationAPI(  # pylint: disable=too-many-instance-attributes
             cached_people = self._people_cache.get(organization_id)
             if cached_people:
                 return cached_people
-        req = requests.get(self._get_people_uri(organization_id))
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.get(self._get_people_uri(organization_id))
         data = process_response(req)
         self._people_cache[organization_id] = data
         return data
@@ -176,7 +183,8 @@ class OrganizationAPI(  # pylint: disable=too-many-instance-attributes
             cached_deals = self._deals_cache.get(organization_id)
             if cached_deals:
                 return cached_deals
-        req = requests.get(self._get_deals_uri(organization_id))
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.get(self._get_deals_uri(organization_id))
         data = process_response(req)
         self._deals_cache[organization_id] = data
         return data
@@ -190,7 +198,8 @@ class OrganizationAPI(  # pylint: disable=too-many-instance-attributes
 
         :return: None
         """
-        requests.put(self._get_details_uri(organization_id), data=fields)
+        with eventlet.Timeout(self.pipedrive.timeout):
+            requests.put(self._get_details_uri(organization_id), data=fields)
 
     def filter_results(  # pylint: disable=too-many-arguments
         self,

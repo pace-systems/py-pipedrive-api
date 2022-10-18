@@ -4,9 +4,12 @@
 from typing import List, Optional, Union
 
 import requests
+import eventlet
 
 from pipedrive.mixins import FieldsMixin, URIMixin
 from pipedrive.utils import process_response
+
+eventlet.monkey_patch()
 
 
 class PersonAPI(URIMixin, FieldsMixin):
@@ -54,7 +57,8 @@ class PersonAPI(URIMixin, FieldsMixin):
             **extra_fields,
         }
 
-        req = requests.put(self._get_details_uri(person_id), data=payload)
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.put(self._get_details_uri(person_id), data=payload)
         return process_response(req)
 
     def create(  # pylint: disable=too-many-arguments
@@ -96,5 +100,6 @@ class PersonAPI(URIMixin, FieldsMixin):
             "org_id": organization_id,
             "visible_to": visible_to,
         }
-        req = requests.post(self._get_base_uri(), data=payload)
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.post(self._get_base_uri(), data=payload)
         return process_response(req)

@@ -4,9 +4,9 @@
 import os
 from typing import Optional
 
-from .deal import DealAPI
-from .organization import OrganizationAPI
-from .person import PersonAPI
+from pipedrive.deal import DealAPI
+from pipedrive.organization import OrganizationAPI
+from pipedrive.person import PersonAPI
 
 
 class Pipedrive:
@@ -14,7 +14,7 @@ class Pipedrive:
     The Pipedrive API.
     """
 
-    def __init__(self, subdomain: str, api_key: Optional[str] = None):
+    def __init__(self, subdomain: str, api_key: Optional[str] = None, timeout: Optional[int] = 5):
         if not subdomain:
             raise ValueError("Subdomain is required.")
         self.base_url = f"https://{subdomain}.pipedrive.com/api/v1/"
@@ -27,6 +27,7 @@ class Pipedrive:
                 "set the PIPEDRIVE_API_KEY environment variable."
             )
         self.api_token = f"api_token={self.api_key}"
+        self.timeout = timeout
         self.deals = DealAPI(self)
         self.organizations = OrganizationAPI(self)
         self.people = PersonAPI(self)

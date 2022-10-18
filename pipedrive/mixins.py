@@ -2,6 +2,9 @@
     Mixin classes for Pipedrive API
 """
 import requests
+import eventlet
+
+eventlet.monkey_patch()
 
 
 class URIMixin:  # pylint: disable=too-few-public-methods
@@ -66,7 +69,9 @@ class FieldsMixin:
         """
         if self.fields and not no_cache:
             return self.fields
-        req = requests.get(self._get_fields_endpoint_uri())
+
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.get(self._get_fields_endpoint_uri())
         json_data = req.json()
         if not json_data["success"]:
             return None

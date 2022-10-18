@@ -4,9 +4,12 @@
 from typing import Dict, List, Optional
 
 import requests
+import eventlet
 
 from pipedrive.mixins import FieldsMixin, URIMixin
 from pipedrive.utils import append_params, process_response
+
+eventlet.monkey_patch()
 
 
 class DealAPI(URIMixin, FieldsMixin):
@@ -39,7 +42,9 @@ class DealAPI(URIMixin, FieldsMixin):
             "title": title,
             **extra_fields,
         }
-        req = requests.post(self._get_base_uri(), data=payload)
+
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.post(self._get_base_uri(), data=payload, )
         return process_response(req)
 
     def update_deal(self, deal_id, fields: Dict) -> None:
@@ -51,7 +56,8 @@ class DealAPI(URIMixin, FieldsMixin):
 
         :return:
         """
-        requests.put(self._get_details_uri(deal_id), data=fields)
+        with eventlet.Timeout(self.pipedrive.timeout):
+            requests.put(self._get_details_uri(deal_id), data=fields)
 
     def get_all(  # pylint: disable=too-many-arguments
         self,
@@ -104,5 +110,7 @@ class DealAPI(URIMixin, FieldsMixin):
             "owned_by_you": owned_by_you,
         }
         uri = append_params(uri, params, True)
-        req = requests.get(uri)
+
+        with eventlet.Timeout(self.pipedrive.timeout):
+            req = requests.get(uri)
         return process_response(req)
